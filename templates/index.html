@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My IoT Dashboard</title>
+</head>
+<body>
+    <h1>My IoT Dashboard</h1>
+    <form action="/api/write?file_name=temperature_celsius.json" method="POST" onsubmit="writeData(event)">
+        <label for="data">Data:</label>
+        <input type="text" id="data" name="data" placeholder="Enter data">
+        <button type="submit">Write Data</button>
+    </form>
+
+    <form action="/api/update?file_name=temperature_celsius.json" method="POST" onsubmit="updateData(event)">
+        <label for="data">Data:</label>
+        <input type="text" id="data" name="data" placeholder="Enter data">
+        <button type="submit">Update Data</button>
+    </form>
+
+    <h2>Temperature</h2>
+    <p id="temperature">Loading...</p>
+
+    <script>
+        // Fetch temperature data from the server
+        fetch('/get_temperature')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('temperature').innerText = `Temperature: ${data.temperature}°C`;
+            });
+
+    function writeData(event) {
+        event.preventDefault();  // Prevent the default form submission
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: form.method,
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Transferred JSON data:', JSON.stringify(data));
+            document.getElementById('feedback').innerText = data.message;
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById('feedback').innerText = 'An error occurred while writing the data.';
+        });
+    }
+
+    function updateData(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: form.method,
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Transferred JSON data:', JSON.stringify(data));
+            document.getElementById('feedback').innerText = data.message;
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById('feedback').innerText = 'An error occurred while updating the data.';
+        });
+    }
+    </script>
+</body>
+</html>
